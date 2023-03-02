@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -5,10 +6,132 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model User {
   id String @id @default(uuid())
-
+  firstname String @unique
+  lastname String
+  email String
+  username String @unique
+  country String @default("CM")
+  adress String
+  phone String
+  created_at DateTime
+  updated_at DateTime
+  products Product[]  
+  orders Order[]
   @@map("user")
+}
+
+
+model Payment_method {
+  id String @id @default(uuid())
+  number String 
+  cvv String
+  fullname String
+  expiry_at DateTime
+  type String
+  orders Order[]
+  @@map("payment_method")
+}
+
+model Supplier {
+  id String @id @default(uuid())
+  name String @unique
+  email String
+  phone String
+  adress String
+  description String 
+  products Product[]
+  @@map("supplier")
+}
+
+model Product_category {
+  id String @id @default(uuid())
+  name String @unique
+  thumnail String
+  description String 
+  product_has_category Product_has_category[]
+  @@map("product_category")
+}
+
+model Product {
+  id String @id @default(uuid())
+  name String @unique
+  thumnail String
+  description String 
+  price Decimal
+  quantity Int
+  status String
+  created_at DateTime
+  updated_at DateTime
+  supplier  Supplier @relation(fields: [Supplier_id], references: [id])
+  Supplier_id String
+  user User  @relation(fields: [User_id], references: [id])
+  User_id String
+
+  product_has_category Product_has_category[]
+
+  @@index([Supplier_id])
+  @@index([User_id])
+
+
+  @@map("product")
+  
+}
+
+model Product_has_category {
+  id String @id @default(uuid())
+  product  Product @relation(fields: [Product_id], references: [id])
+  Product_id String
+  product_category Product_category  @relation(fields: [Product_category_id], references: [id])
+  Product_category_id String
+
+  @@index([Product_id])
+  @@index([Product_category_id])
+
+
+  @@map("Product_has_category")
+  
+}
+
+model Order {
+  id String @id @default(uuid())
+  ref String @unique
+  email String
+  address String 
+  total_amount Decimal
+  discount Decimal
+  delivery_date DateTime
+  status String
+  created_at DateTime
+  updated_at DateTime
+  user User  @relation(fields: [User_id], references: [id])
+  User_id String
+  payment_method Payment_method  @relation(fields: [Payment_method_id], references: [id])
+  Payment_method_id String
+  order_details Order_details[]
+  
+  @@index([User_id])
+  @@index([Payment_method_id])
+
+
+  @@map("order")
+  
+}
+
+
+
+model Order_details {
+  id String @id @default(uuid())
+  name String @unique
+  price Decimal
+  quantity Int 
+  order Order  @relation(fields: [Order_id], references: [id])
+  Order_id String
+  @@index([Order_id])
+  @@map("order_details")
+  
 }

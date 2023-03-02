@@ -6,9 +6,10 @@ const startServer = async () => {
   const prisma = new Prisma();
   await prisma.start();
 
-  app.listen(env.port, () => {
-    console.log(`Server up and running on port ${env.port}`);
-  });
+  const port = process.env.PORT || 5000 ;
+app.listen(port , () => {
+	console.log(`maisoft running on port: ${port}`);
+});
 };
 
 startServer();
